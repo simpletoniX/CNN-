@@ -14,7 +14,7 @@ for i, l in enumerate(labels):          # one hot encoding
 
 labels = one_hot_labels
 
-test_images = x_test.reshape(len(x_test), 28 * 28) / 255       # Normalizing of test data
+test_images = x_test.reshape(len(x_test), 28 * 28) / 255       # Normalizing our test data
 test_labels = np.zeros((len(y_test), 10))
 
 for i, l in enumerate(y_test):
@@ -47,14 +47,14 @@ kernel_rows = 3
 kernel_cols = 3
 num_kernels = 16
 
-# Weights, kernels weights and hidden size
+# >>>  Weights and hidden size
 
 hidden_size = ((input_rows - kernel_rows) * (input_cols - kernel_cols)) * num_kernels
 kernels = 0.02 * np.random.random((kernel_rows * kernel_cols, num_kernels))  - 0.01
 
 weights_1_2 = 0.2 * np.random.random((hidden_size, num_labels)) - 0.1
 
-#Getting a photo for our neural link. After this we can train our neural link
+# >>> Getting a photo for our neural link. After this we can train our neural link
 
 def get_image_section(layer, row_from, row_to, col_from, col_to):
     section = layer[:, row_from:row_to, col_from:col_to]
@@ -70,13 +70,14 @@ for j in range(iterations):
 
         batch_start, batch_end = ((i * batch_size), ((i + 1) * batch_size))
 
-        layer_0 = images[batch_start : batch_end]                                       #layer_0
+        layer_0 = images[batch_start : batch_end]                                       
         layer_0 = layer_0.reshape(layer_0.shape[0], 28, 28)
 
         sects = list()
 
-        for row_start in range(layer_0.shape[1] - kernel_rows):           # loop for photo in height
-            for col_start in range(layer_0.shape[2] - kernel_cols):       # loop for photo in width
+        for row_start in range(layer_0.shape[1] - kernel_rows):    # cycle for photo in height
+           
+            for col_start in range(layer_0.shape[2] - kernel_cols):       # cycle for photo in width
 
                 sect = get_image_section(layer_0, row_start, row_start + kernel_rows, col_start, col_start + kernel_cols)
 
@@ -84,11 +85,13 @@ for j in range(iterations):
 
         expanded_input = np.concatenate(sects, axis=1)
         es = expanded_input.shape
+
         flattened_input = expanded_input.reshape(es[0] * es[1], -1)
 
         kernel_output = flattened_input.dot(kernels)
 
         layer_1 = tanh(kernel_output.reshape(es[0], -1))
+
         dropout_mask = np.random.randint(2, size=layer_1.shape)  # First layer
         layer_1 *= dropout_mask * 2
 
@@ -122,7 +125,9 @@ for j in range(iterations):
         sects = list()
 
         for row_start in range(layer_0.shape[1] - kernel_rows):
+            
             for col_start in range(layer_0.shape[2] - kernel_cols):
+                
                 sect = get_image_section(layer_0, row_start, row_start + kernel_rows, col_start,
                                          col_start + kernel_cols)
 
@@ -135,11 +140,13 @@ for j in range(iterations):
         kernel_output = flattened_input.dot(kernels)
 
         layer_1 = tanh(kernel_output.reshape(es[0], - 1))
+        
         layer_2 = np.dot(layer_1, weights_1_2)
 
         test_correct_cnt += int(np.argmax(layer_2) == np.argmax(test_labels[i:i + 1]))
 
     if (j % 1 == 0):
+
         sys.stdout.write("\n" + "I: " + str(j) + " Test acc: " + str(test_correct_cnt / float(len(test_images))) \
                          + " Train acc: " + str(correct_cnt / float(len(images))))
 
