@@ -20,7 +20,7 @@ test_labels = np.zeros((len(y_test), 10))
 for i, l in enumerate(y_test):
     test_labels[i][l] = 1
 
-# We will use tanh for first layer and softmax for last layer
+# >>> We will use tanh for first layer and softmax for last layer
 
 def tanh(x):
     return np.tanh(x)
@@ -54,13 +54,13 @@ kernels = 0.02 * np.random.random((kernel_rows * kernel_cols, num_kernels))  - 0
 
 weights_1_2 = 0.2 * np.random.random((hidden_size, num_labels)) - 0.1
 
-# >>> Getting a photo for our neural link. After this we can train our neural link
+# >>> Function for getting a part from photo. After this we can train our neural link
 
 def get_image_section(layer, row_from, row_to, col_from, col_to):
     section = layer[:, row_from:row_to, col_from:col_to]
     return section.reshape(-1, 1, row_to - row_from, col_to - col_from)
 
-#So, right now we can start to train our Neural link
+# >>> So, right now we can start to train our Neural link
 
 for j in range(iterations):
 
@@ -82,6 +82,7 @@ for j in range(iterations):
                 sect = get_image_section(layer_0, row_start, row_start + kernel_rows, col_start, col_start + kernel_cols)
 
                 sects.append(sect)
+                
 
         expanded_input = np.concatenate(sects, axis=1)
         es = expanded_input.shape
@@ -92,11 +93,12 @@ for j in range(iterations):
 
         layer_1 = tanh(kernel_output.reshape(es[0], -1))
 
-        dropout_mask = np.random.randint(2, size=layer_1.shape)  # First layer
+        dropout_mask = np.random.randint(2, size=layer_1.shape)         # First layer
         layer_1 *= dropout_mask * 2
 
-        layer_2 = softmax(np.dot(layer_1, weights_1_2))                  # Second layer
+        layer_2 = softmax(np.dot(layer_1, weights_1_2)) # Second layer
 
+        
         for k in range(batch_size):
 
             labelset = labels[batch_start + k : batch_start + k + 1]
@@ -104,19 +106,22 @@ for j in range(iterations):
 
             correct_cnt += _inc
 
-        layer_2_delta = (labels[batch_start:batch_end] - layer_2) / (batch_size * layer_2.shape[0])
+        layer_2_delta = (labels[batch_start:batch_end] - layer_2) / (batch_size * layer_2.shape[0])        # Second layer delta
 
-        layer_1_delta =  layer_2_delta.dot(weights_1_2.T) * tanh2deriv(layer_1)
+        layer_1_delta =  layer_2_delta.dot(weights_1_2.T) * tanh2deriv(layer_1)                            # First layer delta
         layer_1_delta *= dropout_mask
 
         weights_1_2 += alpha * layer_1.T.dot(layer_2_delta)
 
         l1d_reshape = layer_1_delta.reshape(kernel_output.shape)
         k_update = flattened_input.T.dot(l1d_reshape)
+        
         kernels -= alpha * k_update
 
     test_correct_cnt = 0
 
+    # >>> Test  Neural link
+    
     for i in range(len(test_images)):
 
         layer_0 = test_images[i:i + 1]
